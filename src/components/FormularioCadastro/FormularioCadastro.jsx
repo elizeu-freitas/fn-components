@@ -1,66 +1,55 @@
-import React, { useState } from 'react';
-import { Button, TextField, Switch, FormControlLabel } from '@material-ui/core';
+import { Step, StepLabel, Stepper, Typography } from '@material-ui/core';
+import React, { useState, useEffect } from 'react';
+import DadosEntrega from './DadosEntrega';
+import DadosPessoais from './DadosPessoais';
+import DadosUsuario from './DadosUsuario';
 
-const FormularioCadastro = () => {
-    const [nome, setNome] = useState('');
-    const [sobrenome, setSobrenome] = useState('');
+const FormularioCadastro = ({ aoEnviar }) => {
+    const [etapaAtual, setEtapaAtual] = useState(0);
+    const [dadosColetados, setDadosColetados] = useState({});
+
+    useEffect(() => {
+        console.log(dadosColetados);
+    });
+
+    const formularios = [
+        <DadosUsuario aoEnviar={coletarDados} />,
+        <DadosPessoais aoEnviar={coletarDados} />,
+        <DadosEntrega aoEnviar={coletarDados} />,
+        <Typography variant="h5">Obrigado pelo cadastro!</Typography>,
+    ];
+
+    function coletarDados(dados) {
+        setDadosColetados({ ...dadosColetados, ...dados });
+        if (etapaAtual == formularios.length - 1) {
+            aoEnviar(dadosColetados);
+        } else {
+            avancar();
+        }
+    }
+
+    function avancar() {
+        setEtapaAtual(etapaAtual + 1);
+    }
+
     return (
-        <form
-            onSubmit={(event) => {
-                event.preventDefault();
-                console.log(nome);
-            }}
-        >
-            <TextField
-                id="nome"
-                label="Nome"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                value={nome}
-                onChange={(event) => {
-                    setNome(event.target.value);
-                }}
-            />
-
-            <TextField
-                id="sobrenome"
-                label="Sobrenome"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                value={sobrenome}
-                onChange={(event) => {
-                    setSobrenome(event.target.value);
-                }}
-            />
-
-            <TextField
-                id="cpf"
-                label="CPF"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-            />
-
-            <FormControlLabel
-                label="Promoções"
-                control={
-                    <Switch defaultChecked name="promocao" color="primary" />
-                }
-            />
-
-            <FormControlLabel
-                label="Novidades"
-                control={
-                    <Switch defaultChecked name="novidades" color="primary" />
-                }
-            />
-
-            <Button type="submit" variant="contained" color="primary">
-                CADASTRAR
-            </Button>
-        </form>
+        <>
+            <Stepper activeStep={etapaAtual}>
+                <Step>
+                    <StepLabel>Login</StepLabel>
+                </Step>
+                <Step>
+                    <StepLabel>Pessoal</StepLabel>
+                </Step>
+                <Step>
+                    <StepLabel>Entrega</StepLabel>
+                </Step>
+                <Step>
+                    <StepLabel>Finalização</StepLabel>
+                </Step>
+            </Stepper>
+            {formularios[etapaAtual]}
+        </>
     );
 };
 
